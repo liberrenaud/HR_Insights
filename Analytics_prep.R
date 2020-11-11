@@ -59,6 +59,7 @@ NPS_intro %>%
               #alpha=0.6
               )+
 
+  #ISSUE IN MY FACET _ DID NOT MANAGE TO TIDYEVAL IT
   facet_wrap(~employee_region,scales = "free_y",nrow = 1)+
   scale_y_reordered()+  
   scale_color+
