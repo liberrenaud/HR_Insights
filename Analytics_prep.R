@@ -8,14 +8,23 @@ install.packages("pisaitems")
 
 theme_set(theme_light())
 
+carolina_blue <-  "#1997caff"
+cadet_grey<- "#869cb2ff"
+black_coral<- "#4e5f77ff"
+tea_green<- "#bcd8b7ff"
+light_coral<- "#ef6f6c"
+
+
+
 # Set scale for the lolipop graph
 scale_color <- scale_color_gradient2(midpoint=0, 
-                                     low="red",
-                                     mid="white",
-                                     high="blue", 
+                                     low=light_coral,
+                                     mid=cadet_grey,
+                                     high=carolina_blue, 
                                      space ="Lab" )
 
 
+colors_likert <- c(light_coral,cadet_grey,carolina_blue)
 # Import Data
 HR_raw_data <- readxl::read_xlsx("HR_Data.xlsx")
 
@@ -90,16 +99,22 @@ NPS_intro_viz<- function(wrap_category=employee_region,y_category=consultation_n
 #Apply lollipop to two different posible views
 
 NPS_intro_viz()+
-facet_wrap(~employee_region,scales = "free_y",nrow = 1)
+  ggplot2::facet_wrap(~employee_region,scales = "free_y",nrow = 1)
 
 
 NPS_intro_viz(wrap_category=consultation_name,y_category=employee_region,y_label="Regions")+
-  facet_wrap(~consultation_name,scales = "free_y",nrow = 1)
+  ggplot2::facet_wrap(~consultation_name,scales = "free_y",nrow = 1)
 
   
   
+# Function - Likert chart to visualize the details of the rating by regions
+
+likert_visualization <- function(filter_region="all"){
+  
+
 
 likert_frame <- HR_clean_data %>%
+  filter(employee_region=="west") %>% 
   dplyr::filter(interview=="2nd") %>%
   dplyr::select(#employee_region,
                 employee_id,
@@ -120,55 +135,9 @@ likert_frame <- HR_clean_data %>%
   likert_frame$safety %<>% as_factor() %>% fct_relevel("Unhappy","Neutral","Happy")
   
 likert_summary <- likert(likert_frame)
-plot(likert_summary, center=2)
+plot(likert_summary, center=2,low.color= light_coral,mid.color=cadet_grey, high.color=carolina_blue)
+plot(likert_summary, center=2,colors=colors_likert)
 
 
-likert_frame %>% glimpse()
-  
+}
 
-HR_clean_data %>% glimpse()      
-
-
-
-
-# 
-# BACK UP
-# 
-# NPS_intro_viz<- function(wrap_category=employee_region,y_category=consultation_name) {
-#   
-#   
-#   NPS_intro <- HR_clean_data %>% 
-#     dplyr::filter(interview=="2nd") %>% 
-#     group_by({{wrap_category}}, {{y_category}},interview_outcome) %>% 
-#     summarise(n=n()) %>% 
-#     ungroup() %>% 
-#     pivot_wider(values_from = n,names_from=interview_outcome,values_fill=0) %>% 
-#     mutate(all_respondents=Happy+Neutral+Unhappy,
-#            NPS=Happy/all_respondents-Unhappy/all_respondents) %>% 
-#     group_by({{wrap_category}}) %>% 
-#     mutate(NPS_mean=sum(NPS)/nrow(.)) %>% 
-#     ungroup()
-#   
-#   NPS_intro %>% 
-#     mutate(consultation_name=tidytext::reorder_within({{y_category}},NPS,{{wrap_category}})) %>% 
-#     ggplot(aes(NPS,{{y_category}})) +
-#     geom_vline(xintercept = 0,color="gray69", linetype='dashed')+
-#     geom_vline(aes(xintercept = NPS_mean),color="cornflowerblue")+
-#     geom_segment( aes(x=0, xend=NPS, y={{y_category}}, yend={{y_category}}), color="black") +
-#     geom_point( aes(colour=NPS), 
-#                 size=2, 
-#                 #colour="black",
-#                 #alpha=0.6
-#     )+
-#     
-#     #ISSUE IN MY FACET _ DID NOT MANAGE TO TIDYEVAL IT
-#     
-#     scale_y_reordered()+  
-#     scale_color+
-#     theme(
-#       panel.grid.major.y=element_blank(),
-#       panel.grid.major.x=element_line(colour = "grey93")
-#     )
-#   
-#   
-# }
