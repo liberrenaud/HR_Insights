@@ -1,38 +1,5 @@
-library(tidyverse)
-library(janitor)
-library(tidytext)
-library(scales)
-
-install.packages("likert")
-install.packages("pisaitems")
-
-theme_set(theme_light())
-
-carolina_blue <-  "#1997caff"
-cadet_grey<- "#869cb2ff"
-black_coral<- "#4e5f77ff"
-tea_green<- "#bcd8b7ff"
-light_coral<- "#ef6f6c"
-
-
-
-# Set scale for the lolipop graph
-scale_color <- scale_color_gradient2(midpoint=0, 
-                                     low=light_coral,
-                                     mid=cadet_grey,
-                                     high=carolina_blue, 
-                                     space ="Lab" )
-
-
-colors_likert <- c(light_coral,cadet_grey,carolina_blue)
-# Import Data
-HR_raw_data <- readxl::read_xlsx("HR_Data.xlsx")
-
-
-# 1.Summary Data Prep----
-
-
-tidy_HR<- function(){
+tidy_HR <-
+function(){
 HR_clean_data <- HR_raw_data %>% 
   janitor::clean_names() %>% 
   dplyr::select(employee_id:x1st_interview_outcome) %>% 
@@ -45,14 +12,8 @@ HR_clean_data <- HR_raw_data %>%
               dplyr::mutate(interview="2nd")
             )
 }
-
-
-
-# 2.Viz 1 - Lolipop Chart at Overview level----
-
-
-
-NPS_lolipop_viz<- function(wrap_category=employee_region,y_category=consultation_name,y_label="Metrics") {
+NPS_lolipop_viz <-
+function(wrap_category=employee_region,y_category=consultation_name,y_label="Metrics") {
   
   # Prepare the data for the visualization
   NPS_intro <- HR_clean_data %>%
@@ -101,24 +62,8 @@ NPS_lolipop_viz<- function(wrap_category=employee_region,y_category=consultation
   
   
 }
-
-
-
-#Apply lollipop to two different posible views
-
-      # 
-      # NPS_intro_viz()+
-      #   ggplot2::facet_wrap(~employee_region,scales = "free_y",nrow = 1)
-      # 
-      # 
-      # NPS_intro_viz(wrap_category=consultation_name,y_category=employee_region,y_label="Regions")+
-      #   ggplot2::facet_wrap(~consultation_name,scales = "free_y",nrow = 1)
-
-  
-# 3.Viz 2 - Likert Visualization---- 
-
-
-likert_visualization <- function(filter_region="all"){
+likert_visualization <-
+function(filter_region="all"){
 
   
   # Filter the data set based on user selection
@@ -158,11 +103,3 @@ likert_frame <- HR_clean_data %>%
 
 
 }
-
-#4. Save Functions----
-
-function_names <- c("tidy_HR","NPS_lolipop_viz","likert_visualization")
-
-dump(function_names,file="00_scripts/Overview_HR_insights.R")
-
-likert_visualization()
