@@ -32,8 +32,8 @@ HR_raw_data <- readxl::read_xlsx("HR_Data.xlsx")
 # 1.Summary Data Prep----
 
 
-tidy_HR<- function(){
-HR_clean_data <- HR_raw_data %>% 
+tidy_HR<- function(data){
+HR_clean_data <- data %>% 
   janitor::clean_names() %>% 
   dplyr::select(employee_id:x1st_interview_outcome) %>% 
   dplyr::select_all(~str_replace(.,"x1st_","")) %>% 
